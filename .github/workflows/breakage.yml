@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.getmatrix.outputs.matrix }}
+    env:
+      pkg: LinearOperator
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
@@ -20,7 +22,7 @@ jobs:
         run: |
           julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaRegistries/General.git"))'
           julia --project=.breakage -e 'using Pkg; Pkg.update(); Pkg.instantiate()'
-          pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl LinearOperators)
+          pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl ${{ pkg }})
           matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}' | sed -e 's/"/\\"/g')
           echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
@@ -29,7 +31,7 @@ jobs:
     needs: setup_matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.setup_matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.setup_matrix.outputs.matrix) }}
     steps:
       - run: echo "running breakage on ${{ matrix.pkg }}"
 
