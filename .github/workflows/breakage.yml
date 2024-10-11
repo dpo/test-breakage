@@ -20,7 +20,9 @@ jobs:
         run: |
           julia --project=.breakage -e 'using Pkg; Pkg.update(); Pkg.instantiate()'
           pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl LinearOperators)
-          echo "matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')" >> $GITHUB_OUTPUT
+          matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')
+          echo $matrix
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
   break:
     runs-on: ubuntu-latest
