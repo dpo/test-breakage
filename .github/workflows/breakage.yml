@@ -18,6 +18,7 @@ jobs:
           arch: x64
       - id: getmatrix
         run: |
+          julia --project=.breakage -e 'using Pkg; Pkg.update(); Pkg.instantiate()'
           pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl LinearOperators)
           echo "matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')" >> $GITHUB_OUTPUT
 
