@@ -1,0 +1,30 @@
+name: breakage
+
+on:
+  pull_request:
+
+jobs:
+  # Build dynamically the matrix on which the "break" job will run.
+  # The matrix contains the packages that depend on LinearOperators.
+  setup_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.getmatrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: 1
+          arch: x64
+      - id: getmatrix
+        run: |
+          pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl LinearOperators)
+          echo "matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')" >> $GITHUB_OUTPUT
+
+  break:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.setup_matrix.outputs.matrix) }}
+    steps:
+      - run: echo "running breakage on ${{ matrix.pkg }}"
+
