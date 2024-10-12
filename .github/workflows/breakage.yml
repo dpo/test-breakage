@@ -5,7 +5,18 @@ on:
 
 jobs:
   # Build dynamically the matrix on which the "break" job will run.
-  # The matrix contains the packages that depend on LinearOperators.
+  # The matrix contains the packages that depend on ${{ env.pkg }}.
+  # Job "setup_matrix" outputs variable "matrix", which is in turn
+  # the output of the "getmatrix" step.
+  # The contents of "matrix" is a JSON description of a matrix used
+  # in the next step. It has the form
+  # {
+  #   "pkg": [
+  #     "PROPACK",
+  #     "LLSModels",
+  #     "FletcherPenaltySolver"
+  #   ]
+  # }
   setup_matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -23,8 +34,7 @@ jobs:
           julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaRegistries/General.git"))'
           julia --project=.breakage -e 'using Pkg; Pkg.update(); Pkg.instantiate()'
           pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl ${{ env.pkg }})
-          matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')  # | sed -e 's/"/\\"/g')
-          echo $matrix
+          matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')  # don't escape quotes like many posts suggest
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
   break:
