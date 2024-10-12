@@ -25,7 +25,7 @@ jobs:
           pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl ${{ env.pkg }})
           matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}' | sed -e 's/"/\\"/g')
           echo $matrix
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
   break:
     needs: setup_matrix
