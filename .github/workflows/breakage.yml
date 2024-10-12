@@ -43,5 +43,6 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.setup_matrix.outputs.matrix) }}
     steps:
-      - run: echo "running breakage on ${{ matrix.pkg }}"
+      - name: "breakage of ${{ matrix.pkg }}"
+        run: git clone https://github.com/JuliaSmoothOptimizers/${{ matrix.pkg }}
 
