@@ -5,11 +5,24 @@ on:
 
 jobs:
   # Build dynamically the matrix on which the "break" job will run.
-  # The matrix contains the packages that depend on LinearOperators.
+  # The matrix contains the packages that depend on ${{ env.pkg }}.
+  # Job "setup_matrix" outputs variable "matrix", which is in turn
+  # the output of the "getmatrix" step.
+  # The contents of "matrix" is a JSON description of a matrix used
+  # in the next step. It has the form
+  # {
+  #   "pkg": [
+  #     "PROPACK",
+  #     "LLSModels",
+  #     "FletcherPenaltySolver"
+  #   ]
+  # }
   setup_matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.getmatrix.outputs.matrix }}
+    env:
+      pkg: LinearOperators
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
@@ -18,13 +31,17 @@ jobs:
           arch: x64
       - id: getmatrix
         run: |
-          pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl LinearOperators)
-          echo "matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')" >> $GITHUB_OUTPUT
+          julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaRegistries/General.git"))'
+          julia --project=.breakage -e 'using Pkg; Pkg.update(); Pkg.instantiate()'
+          pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl ${{ env.pkg }})
+          matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')  # don't escape quotes like many posts suggest
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
   break:
+    needs: setup_matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.setup_matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.setup_matrix.outputs.matrix) }}
     steps:
       - run: echo "running breakage on ${{ matrix.pkg }}"
 
