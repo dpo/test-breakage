@@ -22,7 +22,7 @@ jobs:
     outputs:
       matrix: ${{ steps.getmatrix.outputs.matrix }}
     env:
-      pkg: LinearOperators
+      pkg: LinearOperators.jl
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
