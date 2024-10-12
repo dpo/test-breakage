@@ -5,7 +5,7 @@ length(ARGS) >= 1 || error("specify at least one JSO package as argument")
 jso_repos, _ = GitHub.repos("JuliaSmoothOptimizers")
 jso_names = [splitext(x.name)[1] for x ∈ jso_repos]
 
-name = ARGS[1]
+name = splitext(ARGS[1])[1]
 name ∈ jso_names || error("argument should be one of ", jso_names)
 
 dependents = String[]
