@@ -44,5 +44,7 @@ jobs:
       matrix: ${{ fromJSON(needs.setup_matrix.outputs.matrix) }}
     steps:
       - name: "breakage of ${{ matrix.pkg }}"
-        run: git clone https://github.com/JuliaSmoothOptimizers/${{ matrix.pkg }}
+        uses: actions/checkout@v4
+        with:
+          repository: JuliaSmoothOptimizers/${{ matrix.pkg }}
 
