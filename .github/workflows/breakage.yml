@@ -23,11 +23,9 @@ jobs:
           julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaRegistries/General.git"))'
           julia --project=.breakage -e 'using Pkg; Pkg.update(); Pkg.instantiate()'
           pkgs=$(julia --project=.breakage .breakage/get_jso_users.jl ${{ env.pkg }})
-          matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}' | sed -e 's/"/\\"/g')
+          matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}')  # | sed -e 's/"/\\"/g')
           echo $matrix
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
 
   break:
     needs: setup_matrix
