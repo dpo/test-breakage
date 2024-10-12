@@ -26,6 +26,8 @@ jobs:
           matrix=$(jq -cn --argjson deps "$pkgs" '{pkg: $deps}' | sed -e 's/"/\\"/g')
           echo $matrix
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
   break:
     needs: setup_matrix
