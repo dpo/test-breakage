@@ -48,10 +48,10 @@ jobs:
       #   if: ${{ matrix.pkg }} == "PROPACK"
       #   uses: mxschmitt/action-tmate@v3
       - name: "breakage of ${{ matrix.pkg }}"
-        run: git clone https://github.com/JuliaSmoothOptimizers/${{ matrix.pkg }}.jl.git
-        # uses: actions/checkout@v4
-        # with:
-        #   repository: JuliaSmoothOptimizers/${{ matrix.pkg }}
-        #   fetch-depth: 0
-        #   fetch-tags: true
+        # run: git clone https://github.com/JuliaSmoothOptimizers/${{ matrix.pkg }}.jl.git
+        uses: actions/checkout@v4
+        with:
+          repository: JuliaSmoothOptimizers/${{ matrix.pkg }}.jl.git
+          fetch-depth: 0
+          fetch-tags: true
 
