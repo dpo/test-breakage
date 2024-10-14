@@ -47,6 +47,9 @@ jobs:
       matrix: ${{ fromJSON(needs.setup_matrix.outputs.matrix) }}
       fail-fast: false
     steps:
+      - name: "debug"
+        if: ${{ matrix.pkg }} == "PROPACK"
+        uses: mxschmitt/action-tmate@v3
       - name: "breakage of ${{ matrix.pkg }}"
         uses: actions/checkout@v4
         with:
